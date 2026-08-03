@@ -1,0 +1,38 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: {{ required "instrumentation.name e obrigatorio" .Values.instrumentation.name | quote }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: otel-team
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: observability
+spec:
+  exporter:
+    endpoint: {{ .Values.instrumentation.gatewayEndpoint | quote }}
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: {{ .Values.instrumentation.sampler | quote }}
+  env:
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_LOGS_EXPORTER
+      value: otlp
+  java:
+    image: {{ .Values.instrumentation.java.image | quote }}
+    env:
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: {{ .Values.instrumentation.java.protocol | quote }}
+  nodejs:
+    image: {{ .Values.instrumentation.nodejs.image | quote }}
+    env:
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: {{ .Values.instrumentation.nodejs.protocol | quote }}
+      - name: NODE_PATH
+        value: {{ .Values.instrumentation.nodejs.nodePath | quote }}
+  python:
+    image: {{ .Values.instrumentation.python.image | quote }}

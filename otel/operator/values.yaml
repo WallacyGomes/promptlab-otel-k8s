@@ -1,0 +1,21 @@
+replicaCount: 1
+
+manager:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+admissionWebhooks:
+  certManager:
+    enabled: false
+  autoGenerateCert:
+    enabled: true
+  pods:
+    failurePolicy: Ignore
+  namespaceSelector:
+    matchLabels:
+      observability.promptlab.io/instrumentation: "enabled"

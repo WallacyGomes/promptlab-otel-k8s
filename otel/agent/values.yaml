@@ -1,0 +1,191 @@
+mode: daemonset
+
+image:
+  repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+  tag: "0.156.0"
+  pullPolicy: IfNotPresent
+
+command:
+  name: otelcol-contrib
+
+presets:
+  logsCollection:
+    enabled: false
+  hostMetrics:
+    enabled: true
+  kubeletMetrics:
+    enabled: true
+  kubernetesAttributes:
+    enabled: true
+    extractAllPodLabels: false
+    extractAllPodAnnotations: false
+
+extraEnvsFrom:
+  - configMapRef:
+      name: otel-exporter-config
+
+service:
+  enabled: false
+
+ports:
+  otlp:
+    enabled: false
+  otlp-http:
+    enabled: false
+  jaeger-compact:
+    enabled: false
+  jaeger-thrift:
+    enabled: false
+  jaeger-grpc:
+    enabled: false
+  zipkin:
+    enabled: false
+  metrics:
+    enabled: false
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+tolerations:
+  - operator: Exists
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+config:
+  exporters:
+    debug: null
+    otlp/gateway:
+      endpoint: ${env:OTEL_GATEWAY_GRPC_ENDPOINT}
+      tls:
+        insecure: true
+      compression: gzip
+      timeout: 10s
+      retry_on_failure:
+        enabled: true
+        initial_interval: 5s
+        max_interval: 30s
+        max_elapsed_time: 300s
+      sending_queue:
+        enabled: true
+        num_consumers: 2
+        queue_size: 1000
+
+  processors:
+    batch:
+      timeout: 5s
+      send_batch_size: 1024
+    k8s_attributes:
+      extract:
+        annotations:
+          - tag_name: service.name
+            key: resource.opentelemetry.io/service.name
+            from: pod
+          - tag_name: service.namespace
+            key: resource.opentelemetry.io/service.namespace
+            from: pod
+          - tag_name: service.version
+            key: resource.opentelemetry.io/service.version
+            from: pod
+          - tag_name: service.criticality
+            key: resource.opentelemetry.io/service.criticality
+            from: pod
+          - tag_name: deployment.environment.name
+            key: resource.opentelemetry.io/deployment.environment.name
+            from: pod
+          - tag_name: tags.time
+            key: resource.opentelemetry.io/tags.time
+            from: pod
+    resource/cluster:
+      attributes:
+        - key: k8s.cluster.name
+          value: ${env:OTEL_CLUSTER_NAME}
+          action: upsert
+        - key: k8s.cluster.uid
+          value: ${env:OTEL_CLUSTER_UID}
+          action: upsert
+        - key: k8s.node.name
+          value: ${env:K8S_NODE_NAME}
+          action: upsert
+        - key: deployment.environment.name
+          value: ${env:OTEL_DEPLOYMENT_ENVIRONMENT}
+          action: upsert
+
+  receivers:
+    hostmetrics:
+      scrapers:
+        cpu:
+          metrics:
+            system.cpu.utilization:
+              enabled: true
+        memory:
+          metrics:
+            system.memory.utilization:
+              enabled: true
+        filesystem:
+          include_virtual_filesystems: true
+          include_mount_points:
+            mount_points:
+              - /
+            match_type: strict
+          metrics:
+            system.filesystem.usage:
+              enabled: true
+            system.filesystem.utilization:
+              enabled: true
+          exclude_fs_types:
+            fs_types:
+              - autofs
+              - binfmt_misc
+              - bpf
+              - cgroup2
+              - configfs
+              - debugfs
+              - devpts
+              - devtmpfs
+              - fusectl
+              - hugetlbfs
+              - iso9660
+              - mqueue
+              - nsfs
+              - proc
+              - procfs
+              - pstore
+              - rpc_pipefs
+              - securityfs
+              - selinuxfs
+              - squashfs
+              - sysfs
+              - tracefs
+            match_type: strict
+        network:
+          metrics:
+            system.network.errors:
+              enabled: true
+    jaeger: null
+    kubeletstats:
+      insecure_skip_verify: true
+    otlp: null
+    zipkin: null
+
+  service:
+    extensions:
+      - health_check
+    pipelines:
+      logs: null
+      metrics:
+        receivers:
+          - prometheus
+        processors:
+          - memory_limiter
+          - k8s_attributes
+          - resource/cluster
+          - batch
+        exporters:
+          - otlp/gateway
+      traces: null

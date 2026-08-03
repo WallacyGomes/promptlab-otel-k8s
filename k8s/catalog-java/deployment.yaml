@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-java
+  labels:
+    app.kubernetes.io/part-of: promptlab
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog-java
+  template:
+    metadata:
+      labels:
+        app: catalog-java
+        app.kubernetes.io/part-of: promptlab
+        app.kubernetes.io/managed-by: kubectl
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: promptlab
+        resource.opentelemetry.io/service.name: PromptLab Catalog Api (prd)
+        resource.opentelemetry.io/service.namespace: promptlab
+        resource.opentelemetry.io/service.version: local
+        resource.opentelemetry.io/service.criticality: low
+        resource.opentelemetry.io/deployment.environment.name: local
+        resource.opentelemetry.io/tags.time: promptlab
+    spec:
+      containers:
+        - name: catalog-java
+          image: promptlab/catalog-java:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: LAB_MODE
+              value: "true"
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://postgres:5432/prompt_lab
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: prompt_user
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10

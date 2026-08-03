@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "releaseName": { "type": "string", "minLength": 1 },
+    "instrumentation": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "gatewayEndpoint": { "type": "string", "pattern": "^http://.+:4318$" },
+        "sampler": { "type": "string", "enum": ["always_on"] },
+        "java": { "type": "object", "properties": { "image": { "type": "string", "minLength": 1 }, "protocol": { "const": "http/protobuf" } }, "required": ["image", "protocol"] },
+        "nodejs": { "type": "object", "properties": { "image": { "type": "string", "minLength": 1 }, "protocol": { "const": "http/protobuf" }, "nodePath": { "type": "string", "minLength": 1 } }, "required": ["image", "protocol", "nodePath"] },
+        "python": { "type": "object", "properties": { "image": { "type": "string", "minLength": 1 } }, "required": ["image"] }
+      },
+      "required": ["name", "gatewayEndpoint", "sampler", "java", "nodejs", "python"]
+    }
+  },
+  "required": ["instrumentation"]
+}

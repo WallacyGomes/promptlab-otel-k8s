@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-node
+  labels:
+    app.kubernetes.io/part-of: promptlab
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store-node
+  template:
+    metadata:
+      labels:
+        app: store-node
+        app.kubernetes.io/part-of: promptlab
+        app.kubernetes.io/managed-by: kubectl
+      annotations:
+        instrumentation.opentelemetry.io/inject-nodejs: promptlab
+        resource.opentelemetry.io/service.name: PromptLab Store Api (prd)
+        resource.opentelemetry.io/service.namespace: promptlab
+        resource.opentelemetry.io/service.version: local
+        resource.opentelemetry.io/service.criticality: low
+        resource.opentelemetry.io/deployment.environment.name: local
+        resource.opentelemetry.io/tags.time: promptlab
+    spec:
+      containers:
+        - name: store-node
+          image: promptlab/store-node:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: LAB_MODE
+              value: "true"
+            - name: PORT
+              value: "3000"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: url
+            - name: CATALOG_SERVICE_URL
+              value: http://catalog-java:8080
+            - name: INSIGHTS_SERVICE_URL
+              value: http://insights-python:8000
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10

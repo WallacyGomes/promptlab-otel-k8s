@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PromptLab Store</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <strong>PromptLab</strong>
+          <span>marketplace de prompts prontos</span>
+        </div>
+      </div>
+      <button class="cart-button" id="cartButton" type="button">
+        <span aria-hidden="true">▣</span>
+        <span>Carrinho</span>
+        <strong id="cartCount">0</strong>
+      </button>
+    </header>
+
+    <main class="shell">
+      <section class="catalog-panel">
+        <div class="intro">
+          <div>
+            <p class="eyebrow">Lab full-stack dockerizado</p>
+            <h1>Prompts prontos para times que precisam sair do zero rápido.</h1>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="tile tile-a"></div>
+            <div class="tile tile-b"></div>
+            <div class="tile tile-c"></div>
+          </div>
+        </div>
+
+        <form class="filters" id="filters">
+          <label>
+            <span>Busca</span>
+            <input id="search" name="q" type="search" placeholder="copy, testes, imagem...">
+          </label>
+          <label>
+            <span>Categoria</span>
+            <select id="category" name="categoryId">
+              <option value="">Todas</option>
+            </select>
+          </label>
+          <button type="submit">Filtrar</button>
+        </form>
+
+        <div class="section-heading">
+          <h2>Vitrine</h2>
+          <span id="resultCount"></span>
+        </div>
+        <div class="prompt-grid" id="promptGrid"></div>
+      </section>
+
+      <aside class="side-panel">
+        <section class="detail-panel" id="detailPanel">
+          <p class="muted">Selecione um prompt para ver detalhes, texto completo e recomendações.</p>
+        </section>
+
+        <section class="cart-panel">
+          <div class="section-heading">
+            <h2>Carrinho</h2>
+            <button class="ghost" id="clearCart" type="button">Limpar</button>
+          </div>
+          <div id="cartItems" class="cart-items"></div>
+          <div class="cart-total">
+            <span>Total</span>
+            <strong id="cartTotal">R$ 0,00</strong>
+          </div>
+          <form class="checkout" id="checkoutForm">
+            <input name="buyerName" placeholder="Nome" required>
+            <input name="buyerEmail" placeholder="Email" type="email" required>
+            <button type="submit">Finalizar compra simulada</button>
+          </form>
+          <p class="checkout-status" id="checkoutStatus"></p>
+        </section>
+      </aside>
+    </main>
+
+    <template id="promptCardTemplate">
+      <article class="prompt-card">
+        <div class="card-top">
+          <span class="category"></span>
+          <strong class="price"></strong>
+        </div>
+        <h3></h3>
+        <p></p>
+        <div class="tags"></div>
+        <div class="card-actions">
+          <button class="secondary details" type="button">Detalhes</button>
+          <button class="add" type="button">Adicionar</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

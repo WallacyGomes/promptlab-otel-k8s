@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insights-python
+  labels:
+    app.kubernetes.io/part-of: promptlab
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insights-python
+  template:
+    metadata:
+      labels:
+        app: insights-python
+        app.kubernetes.io/part-of: promptlab
+        app.kubernetes.io/managed-by: kubectl
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: promptlab
+        resource.opentelemetry.io/service.name: PromptLab Insights Api (prd)
+        resource.opentelemetry.io/service.namespace: promptlab
+        resource.opentelemetry.io/service.version: local
+        resource.opentelemetry.io/service.criticality: low
+        resource.opentelemetry.io/deployment.environment.name: local
+        resource.opentelemetry.io/tags.time: promptlab
+    spec:
+      containers:
+        - name: insights-python
+          image: promptlab/insights-python:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: LAB_MODE
+              value: "true"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: url
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Contrato de observabilidade OTel por workload",
+  "type": "object",
+  "properties": {
+    "observability": {
+      "type": "object",
+      "properties": {
+        "otel": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "instrumentationName": { "type": "string", "minLength": 1 },
+            "language": { "type": "string", "enum": ["java", "nodejs", "python"] },
+            "serviceName": { "type": "string", "minLength": 1 },
+            "serviceVersion": { "type": "string", "minLength": 1 },
+            "environment": { "type": "string", "minLength": 1 },
+            "criticality": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+            "time": { "type": "string", "minLength": 1 }
+          },
+          "required": ["enabled"]
+        }
+      },
+      "required": ["otel"]
+    }
+  },
+  "required": ["observability"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "observability": {
+            "properties": {
+              "otel": {
+                "properties": { "enabled": { "const": true } },
+                "required": ["enabled"]
+              }
+            },
+            "required": ["otel"]
+          }
+        },
+        "required": ["observability"]
+      },
+      "then": {
+        "properties": {
+          "observability": {
+            "properties": {
+              "otel": {
+                "required": [
+                  "instrumentationName",
+                  "language",
+                  "serviceName",
+                  "serviceVersion",
+                  "environment",
+                  "criticality",
+                  "time"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

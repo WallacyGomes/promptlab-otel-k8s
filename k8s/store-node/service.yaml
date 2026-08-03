@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-node
+  labels:
+    app.kubernetes.io/part-of: promptlab
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  selector:
+    app: store-node
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

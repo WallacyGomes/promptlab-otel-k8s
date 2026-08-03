@@ -1,0 +1,4 @@
+releaseName: promptlab-otel-team
+
+instrumentation:
+  name: promptlab

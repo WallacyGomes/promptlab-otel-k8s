@@ -1,0 +1,6 @@
+apiVersion: v2
+name: otel-workload
+description: Biblioteca Helm para auto-instrumentacao OpenTelemetry opt-in por workload.
+type: library
+version: 0.1.0
+appVersion: "0.1.0"

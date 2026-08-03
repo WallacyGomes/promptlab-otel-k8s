@@ -1,0 +1,21 @@
+installation:
+  namespace: observability
+  collectorChart: open-telemetry/opentelemetry-collector
+  collectorChartVersion: "0.165.0"
+  operatorChart: open-telemetry/opentelemetry-operator
+  operatorChartVersion: "0.120.0"
+  agentRelease: otel-agent
+  gatewayRelease: otel-gateway
+  operatorRelease: otel-operator
+  deploymentEnvironment: local
+
+exporters:
+  - newrelic
+  - grafana
+
+newRelic:
+  region: US
+
+grafana:
+  otlpEndpoint: "https://otlp-gateway-prod-sa-east-1.grafana.net/otlp"
+  instanceId: "878459"

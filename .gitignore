@@ -1,0 +1,23 @@
+# Artefatos locais gerados por testes e builds
+.pytest_cache/
+**/__pycache__/
+*.py[cod]
+services/catalog-java/target/
+services/store-node/node_modules/
+
+# Credenciais e configuracoes locais: nunca versionar
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.kubeconfig
+kubeconfig
+.kube/
+secrets/
+*.secrets.yaml
+*.secrets.yml
+*-private.yaml
+*-private.yml

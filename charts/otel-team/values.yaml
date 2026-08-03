@@ -1,0 +1,13 @@
+instrumentation:
+  name: ""
+  gatewayEndpoint: http://otel-gateway-opentelemetry-collector.observability.svc.cluster.local:4318
+  sampler: always_on
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.26.0
+    protocol: http/protobuf
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.78.0
+    protocol: http/protobuf
+    nodePath: /app/node_modules
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.64b0
