@@ -17,5 +17,5 @@ newRelic:
   region: US
 
 grafana:
-  otlpEndpoint: "https://otlp-gateway-prod-sa-east-1.grafana.net/otlp"
-  instanceId: "878459"
+  otlpEndpoint: "SEU_ENDPOINT"
+  instanceId: "SEU_ID"
